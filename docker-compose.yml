@@ -1,0 +1,89 @@
+version: "3"
+
+networks:
+  frontend:
+
+services:
+  jenkins:
+    build:
+      context: jenkins
+    networks: 
+      frontend:
+    restart: always
+    tty: true
+    ports:
+      - 50000:50000
+      - 8080:8080
+    volumes:
+      - ${DATA_DIR}/jenkins/:/var/jenkins_home
+  gogs:
+    # build:
+    #   context: gogs
+    image: gogs/gogs
+    depends_on:
+      - mysql
+    tty: true
+    networks: 
+      frontend:
+    restart: always
+    volumes:
+      - ${DATA_DIR}/gogs:/data:rw
+  mysql:
+    # build:
+    #   context: mysql
+    image: mysql:5.7
+    networks: 
+      frontend:
+    tty: true
+    restart: always
+    ports:
+      - 3306:3306
+    volumes:
+      - ${DATA_DIR}/mysql/:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+  etcd:
+    build:
+      context: etcd
+    networks: 
+      frontend:
+    tty: true
+    restart: always
+    ports:
+      - 2379:2379
+      - 2380:2380
+      - 4001:4001
+      - 7001:7001
+    volumes:
+      - ${DATA_DIR}/etcd/:/data
+  zookeeper:
+    build:
+      context: zookeeper
+    tty: true
+    restart: always
+    networks: 
+      frontend:
+    ports:
+      - 2181:2181
+      - 2888:2888
+      - 3888:3888
+    volumes:
+      - ${DATA_DIR}/zookeeper/conf:/conf
+      - ${DATA_DIR}/zookeeper/log:/log
+      - ${DATA_DIR}/zookeeper/data:/data
+  gogs_nginx:
+    build:
+      context: nginx
+    tty: true
+    depends_on:
+      - gogs
+    restart: always
+    networks: 
+      frontend:
+    ports:
+      - 80:80
+    volumes:
+      - ./nginx/conf:/etc/nginx/conf.d
+      - ${DATA_DIR}/nginx/conf:/var/log/nginx
