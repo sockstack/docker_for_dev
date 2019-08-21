@@ -23,6 +23,10 @@ services:
     depends_on:
       - mysql
     tty: true
+    ports:
+      - 22:22
+      - 8081:80
+      - 3000:3000
     networks: 
       frontend:
     restart: always
@@ -87,3 +91,24 @@ services:
     volumes:
       - ./nginx/conf:/etc/nginx/conf.d
       - ${DATA_DIR}/nginx/conf:/var/log/nginx
+  drone-server:
+    image: drone/drone:1
+    depends_on:
+      - gogs_nginx
+    volumes:
+      - ${DATA_DIR}/drone/run:/var/run/docker.sock
+      - ${DATA_DIR}/drone/data:/data
+    networks: 
+      frontend:
+    environment:
+      - DRONE_GIT_ALWAYS_AUTH=false
+      - DRONE_GOGS_SERVER=http://gogs:3000/
+      - DRONE_RUNNER_CAPACITY=2
+      - DRONE_SERVER_HOST=http://drone-server
+      - DRONE_SERVER_PROTO=http
+      - DRONE_TLS_AUTOCERT=false
+    restart: always
+    tty: true
+    ports:
+      - 8080:80
+      - 443:443
