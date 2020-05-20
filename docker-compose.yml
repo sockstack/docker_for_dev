@@ -51,6 +51,8 @@ services:
   etcd:
     build:
       context: etcd
+    environment: 
+      - ETCDCTL_API=3
     networks: 
       frontend:
     tty: true
