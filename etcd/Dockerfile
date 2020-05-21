@@ -1,1 +1,1 @@
-FROM elcolio/etcd
+FROM gcr.io/etcd-development/etcd
