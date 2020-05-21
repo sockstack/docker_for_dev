@@ -4,6 +4,17 @@ networks:
   frontend:
 
 services:
+  workspace:
+    build: 
+      context: workspace
+    tty: true
+    restart: always
+    volumes: 
+      - ${WORK_ON}:/var/www/
+    ports: 
+      - ${WORKSPACE_WEB_PORT}:8080
+    networks: 
+      - frontend
   jenkins:
     build:
       context: jenkins
@@ -112,3 +123,7 @@ services:
     ports:
       - 8080:80
       - 443:443
+  gitlab:
+    image: store/gitlab/gitlab-ee:11.10.4-ee.0
+    ports:
+      - 8081:80
