@@ -2,8 +2,12 @@ version: "3"
 
 networks:
   frontend:
+  default:
+    external:
+      name: traefik_default
 
 services:
+  # 工作环境
   workspace:
     build: 
       context: workspace
@@ -15,6 +19,7 @@ services:
       - ${WORKSPACE_WEB_PORT}:8080
     networks: 
       - frontend
+  # jenkins自动化部署
   jenkins:
     build:
       context: jenkins
@@ -27,6 +32,7 @@ services:
       - 8080:8080
     volumes:
       - ${DATA_DIR}/jenkins/:/var/jenkins_home
+  # gogs代码仓库
   gogs:
     # build:
     #   context: gogs
@@ -43,6 +49,7 @@ services:
     restart: always
     volumes:
       - ${DATA_DIR}/gogs:/data:rw
+  # mysql数据库
   mysql:
     # build:
     #   context: mysql
@@ -59,6 +66,7 @@ services:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
       - MYSQL_USER=${MYSQL_USER}
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+  # etcd数据库
   etcd:
     build:
       context: etcd
@@ -75,6 +83,7 @@ services:
       - 7001:7001
     volumes:
       - ${DATA_DIR}/etcd/:/data
+  # zookeeper数据库
   zookeeper:
     build:
       context: zookeeper
@@ -90,7 +99,7 @@ services:
       - ${DATA_DIR}/zookeeper/conf:/conf
       - ${DATA_DIR}/zookeeper/log:/log
       - ${DATA_DIR}/zookeeper/data:/data
-  gogs_nginx:
+  nginx:
     build:
       context: nginx
     tty: true
@@ -107,7 +116,7 @@ services:
   drone-server:
     image: drone/drone:1
     depends_on:
-      - gogs_nginx
+      - nginx
     volumes:
       - ${DATA_DIR}/drone/run:/var/run/docker.sock
       - ${DATA_DIR}/drone/data:/data
@@ -129,3 +138,16 @@ services:
     image: store/gitlab/gitlab-ee:11.10.4-ee.0
     ports:
       - 8081:80
+  traefik:
+    image: traefik:v2.0
+    command: --api.insecure=true --providers.docker
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+  whoami:
+    image: containous/whoami
+    labels:
+      # 设置Host 为 whoami.docker.localhost 进行域名访问
+      - "traefik.http.routers.whoami.rule=Host(`whoami.docker.localhost`)"
