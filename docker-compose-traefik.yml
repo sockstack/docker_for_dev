@@ -26,3 +26,11 @@ services:
     labels:
       # 设置Host 为 whoami.docker.localhost 进行域名访问
       - "traefik.http.routers.whoami.rule=Host(`test.sockstack.cn`)"
+  dns:
+    image: jpillora/dnsmasq
+    restart: always
+    ports: 
+      - "53:53/udp"
+    volumes:
+      - ./dnsmasq/dnsmasq.conf:/etc/dnsmasq.conf
+      - ./dnsmasq/resolv.conf:/etc/resolv.conf
