@@ -16,7 +16,11 @@
 ################################################################
 # Entrypoints configuration
 ################################################################
+[certificatesResolvers.le.acme]
+  email = "85564748@qq.com"
+  storage = "acme.json"
 
+  [certificatesResolvers.le.acme.tlsChallenge]
 # Entrypoints definition
 #
 # Optional
@@ -144,7 +148,7 @@
   # Optional
   # Default: "Host(`{{ normalize .Name }}`)"
   #
-  defaultRule = "Host(`{{ normalize .Name }}.shayue.localhost`)"
+  defaultRule = "Host(`{{ normalize .Name }}.sockstack.cn`)"
 
   # Expose containers by default in traefik
   #
