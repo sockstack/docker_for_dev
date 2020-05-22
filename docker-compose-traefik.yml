@@ -4,7 +4,6 @@ networks:
   default:
     external:
       name: traefik_default
-  frontend:
 
 services:
   traefik:
@@ -23,6 +22,13 @@ services:
       # 设置Host 为 whoami.docker.localhost 进行域名访问
       - "traefik.http.routers.api.rule=Host(`traefik.sockstack.cn`)"
       - "traefik.http.routers.api.service=api@internal"
+      # global redirect to https
+      - "traefik.http.routers.http-catchall.rule=hostregexp(`{host:.+}`)"
+      - "traefik.http.routers.http-catchall.entrypoints=web"
+      - "traefik.http.routers.http-catchall.middlewares=redirect-to-https"
+
+      # middleware redirect
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
   whoami:
     image: containous/whoami
     labels:
