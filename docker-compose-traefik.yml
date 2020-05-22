@@ -36,7 +36,6 @@ services:
       - "traefik.http.routers.whoami.rule=Host(`test.sockstack.cn`)"
       - traefik.http.routers.whoami.tls=true
       - traefik.http.routers.whoami.tls.certresolver=le
-
   dns:
     image: jpillora/dnsmasq
     restart: always
@@ -45,3 +44,13 @@ services:
     volumes:
       - ./dnsmasq/dnsmasq.conf:/etc/dnsmasq.conf
       - ./dnsmasq/resolv.conf:/etc/resolv.conf
+    openvpn:
+      cap_add:
+        - NET_ADMIN
+      image: kylemanna/openvpn
+      container_name: openvpn
+      ports:
+        - "1194:1194/udp"
+      restart: always
+      volumes:
+        - ./openvpn/conf:/etc/openvpn
