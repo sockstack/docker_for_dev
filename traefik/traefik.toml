@@ -157,3 +157,9 @@
   storage = "acme.json"
 
   [certificatesResolvers.le.acme.tlsChallenge]
+
+[http.middlewares]
+  [http.middlewares.test-auth.basicAuth]
+  users = [
+    "sockstack:123456", 
+  ]
