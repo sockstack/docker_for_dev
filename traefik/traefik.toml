@@ -16,11 +16,6 @@
 ################################################################
 # Entrypoints configuration
 ################################################################
-[certificatesResolvers.le.acme]
-  email = "85564748@qq.com"
-  storage = "acme.json"
-
-  [certificatesResolvers.le.acme.tlsChallenge]
 # Entrypoints definition
 #
 # Optional
@@ -156,3 +151,9 @@
   # Default: true
   #
   # exposedByDefault = false
+
+[certificatesResolvers.le.acme]
+  email = "85564748@qq.com"
+  storage = "acme.json"
+
+  [certificatesResolvers.le.acme.tlsChallenge]

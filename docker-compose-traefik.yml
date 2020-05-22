@@ -17,6 +17,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./traefik/traefik.toml:/etc/traefik/traefik.toml
       - ./traefik/acme.json:/acme.json
+      - ./log/:/var/log/
     labels:
       # 设置Host 为 whoami.docker.localhost 进行域名访问
       - "traefik.http.routers.api.rule=Host(`traefik.sockstack.cn`)"
@@ -26,6 +27,9 @@ services:
     labels:
       # 设置Host 为 whoami.docker.localhost 进行域名访问
       - "traefik.http.routers.whoami.rule=Host(`test.sockstack.cn`)"
+      - traefik.http.routers.whoami.tls=true
+      - traefik.http.routers.whoami.tls.certresolver=le
+
   dns:
     image: jpillora/dnsmasq
     restart: always
